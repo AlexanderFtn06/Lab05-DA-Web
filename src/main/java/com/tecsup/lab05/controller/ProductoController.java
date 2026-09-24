@@ -69,20 +69,13 @@ public class ProductoController {
         existente.setStock(dto.getStock());
         existente.setCategoria(dto.getCategoria());
 
-        return ResponseEntity.ok(service.guardar(existente));
+        return ResponseEntity.ok(service.actualizar(id,existente));
     }
 
 
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
-
-        Producto p = service.obtener(id);
-
-        if (p == null) {
-            return ResponseEntity.status(404).body("No existe");
-        }
-
         service.eliminar(id);
         return ResponseEntity.ok("Eliminado correctamente");
     }

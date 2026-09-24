@@ -20,4 +20,10 @@ public class GlobalExceptionHandler {
         });
         return ResponseEntity.badRequest().body(errores);
     }
+    @ExceptionHandler(ProductoNoEncontradoException.class)
+    public ResponseEntity<Map<String, String>> manejarProductoNoEncontrado(ProductoNoEncontradoException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity.status(404).body(error);
+    }
 }

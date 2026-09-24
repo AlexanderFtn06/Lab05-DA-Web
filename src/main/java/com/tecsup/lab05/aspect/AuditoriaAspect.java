@@ -6,6 +6,8 @@ import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Aspect
 @Component
 public class AuditoriaAspect {
@@ -30,6 +32,36 @@ public class AuditoriaAspect {
                 "ELIMINAR",
                 joinPoint.getSignature().getName(),
                 "Se eliminó un producto"
+        );
+    }
+    @AfterReturning("execution(* com.tecsup.lab05.service.ProductoService.actualizar(..))")
+    public void auditarActualizar(JoinPoint joinPoint) {
+
+        Object[] args = joinPoint.getArgs();
+        String idProducto = args.length > 0 ? String.valueOf(args[0]) : "desconocido";
+
+        auditoriaService.registrar(
+                "ACTUALIZAR",
+                joinPoint.getSignature().getName(),
+                "Se actualizó producto con ID: " + idProducto
+        );
+    }
+
+    @AfterReturning(
+            pointcut = "execution(* com.tecsup.lab05.service.ProductoService.listar(..))",
+            returning = "resultado"
+    )
+    public void auditarListar(JoinPoint joinPoint, Object resultado) {
+
+        int cantidad = 0;
+        if (resultado instanceof List<?> lista) {
+            cantidad = lista.size();
+        }
+
+        auditoriaService.registrar(
+                "LISTAR",
+                joinPoint.getSignature().getName(),
+                "Se obtuvieron " + cantidad + " registros"
         );
     }
 }
