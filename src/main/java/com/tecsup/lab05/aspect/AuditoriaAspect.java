@@ -25,7 +25,7 @@ public class AuditoriaAspect {
     // Usuarios centralizados
     private Map<String, String> usuarios = Map.of(
             "Faustino", "ADMIN",
-            "Ana", "USER",
+            "Alexander", "USER",
             "Luis", "USER"
     );
 
@@ -82,7 +82,26 @@ public class AuditoriaAspect {
     // CONTROL POR MÉTODO
     @Before("execution(* com.tecsup.lab05.service.ProductoService.guardar(..))")
     public void validarCrear() {
-        validarRol("ADMIN");
+        validarRol("ADMIN","USER");
+    }
+
+    @AfterReturning(
+            pointcut = "execution(* com.tecsup.lab05.service.ProductoService.listar(..))",
+            returning = "resultado"
+    )
+    public void auditarListar(JoinPoint joinPoint, Object resultado) {
+
+        int cantidad = 0;
+        if (resultado instanceof java.util.List<?> lista) {
+            cantidad = lista.size();
+        }
+
+        auditoriaService.registrar(
+                "LISTAR",
+                joinPoint.getSignature().getName(),
+                "Cantidad de productos: " + cantidad,
+                obtenerUsuario()
+        );
     }
 
     @Before("execution(* com.tecsup.lab05.service.ProductoService.eliminar(..))")
